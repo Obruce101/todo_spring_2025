@@ -4,11 +4,13 @@ TODO Spring 2025
 
 Oliver and Rusha
 
-
-- Calendar
-- Location
+To-Do:
 - Subtasks
-- Categories
-- Stats
+- Icon
 - Milestone
-- Sound/Haptics
+
+  Done:
+- Profile
+- Stats
+- Sound
+- Location
