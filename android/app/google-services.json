@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "597728781701",
+    "project_id": "todo-spring-2025-0",
+    "storage_bucket": "todo-spring-2025-0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:597728781701:android:cbd5b8da0c65ca25c6d0ec",
+        "android_client_info": {
+          "package_name": "com.example.todo_spring_2025"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAx0DwL5MWQ85msIlEvTzQLL1lehZoEs1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
