@@ -1,4 +1,5 @@
 import 'package:app_settings/app_settings.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,12 +19,32 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   late TextEditingController _textController;
+  late TextEditingController _subtaskController; //
+
   DateTime? _selectedDueDate;
+
+  void _addSubtask() async {
+    if (_subtaskController.text.isEmpty) return;
+
+    final newSubtask = SubTask(
+      id: DateTime.now().toString(),
+      text: _subtaskController.text,
+    );
+
+    await FirebaseFirestore.instance.collection('todos').doc(widget.todo.id).update({
+      'subtasks': FieldValue.arrayUnion([newSubtask.toMap()]),
+    });
+
+    _subtaskController.clear();
+  }
+
+
 
   @override
   void initState() {
     super.initState();
     _textController = TextEditingController(text: widget.todo.text);
+    _subtaskController = TextEditingController();
     _selectedDueDate = widget.todo.dueAt;
   }
 
@@ -68,6 +89,10 @@ class _DetailScreenState extends State<DetailScreen> {
           .collection('todos')
           .doc(widget.todo.id)
           .update({'dueAt': newDueDate == null ? null : Timestamp.fromDate(newDueDate)});
+
+      if (mounted) {
+        widget.todo.onDueDateUpdated?.call();
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -78,6 +103,7 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Future<bool> _requestNotificationPermission() async {
+    if (kIsWeb) return true;
     final isGranted = await flutterLocalNotificationsPlugin
             .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
             ?.requestNotificationsPermission() ??
@@ -142,6 +168,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   void dispose() {
     _textController.dispose();
+    _subtaskController.dispose();
     super.dispose();
   }
 

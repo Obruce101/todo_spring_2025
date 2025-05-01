@@ -1,4 +1,37 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+class SubTask {
+  final String id;
+  final String text;
+  final bool isCompleted;
+
+  SubTask({
+    required this.id,
+    required this.text,
+    this.isCompleted = false,
+  });
+
+  factory SubTask.fromMap(Map<String, dynamic> map) {
+    return SubTask(
+      id: map['id'] ?? '',
+      text: map['text'] ?? '',
+      isCompleted: map['isCompleted'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'text': text,
+      'isCompleted': isCompleted,
+    };
+  }
+}
+
+
+
 
 class Todo {
   final String id;
@@ -7,6 +40,7 @@ class Todo {
   final DateTime createdAt;
   final DateTime? completedAt;
   final DateTime? dueAt;
+  final VoidCallback? onDueDateUpdated;
 
   Todo({
     required this.id,
@@ -15,7 +49,21 @@ class Todo {
     required this.createdAt,
     required this.completedAt,
     required this.dueAt,
+    this.onDueDateUpdated,
   });
+
+  Todo copyWith({VoidCallback? onDueDateUpdated}) {
+    return Todo(
+      id: id,
+      text: text,
+      uid: uid,
+      createdAt: createdAt,
+      dueAt: dueAt,
+      completedAt: completedAt,
+      onDueDateUpdated: onDueDateUpdated ?? this.onDueDateUpdated,
+
+    );
+  }
 
   Map<String, dynamic> toSnapshot() {
     return {
@@ -29,6 +77,7 @@ class Todo {
 
   factory Todo.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
+
     return Todo(
       id: snapshot.id,
       text: data['text'],

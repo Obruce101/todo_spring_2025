@@ -1,0 +1,2 @@
+/Users/obruce/StudioProjects/todo_spring_2025/android/app/.cxx/Debug/324g1vp3/x86/CMakeFiles/edit_cache.dir
+/Users/obruce/StudioProjects/todo_spring_2025/android/app/.cxx/Debug/324g1vp3/x86/CMakeFiles/rebuild_cache.dir
