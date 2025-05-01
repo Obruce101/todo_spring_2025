@@ -7,10 +7,11 @@ Oliver and Rusha
 To-Do:
 - Subtasks
 - Icon
-- Milestone
+- Delete Tasks
 
   Done:
 - Profile
 - Stats
 - Sound
 - Location
+- Milestone
