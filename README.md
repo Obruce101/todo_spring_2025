@@ -5,13 +5,13 @@ TODO Spring 2025
 Oliver and Rusha
 
 To-Do:
-- Subtasks
-- Icon
-- Delete Tasks
+- Subtasks (Rusha)
+- Icon (Rusha)
 
-  Done:
+DONE:
 - Profile
 - Stats
 - Sound
 - Location
 - Milestone
+- Daily To-Do Progress
