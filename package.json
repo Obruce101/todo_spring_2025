@@ -1,0 +1,22 @@
+{
+  "name": "todo_spring_2025",
+  "version": "1.0.0",
+  "description": "TODO Spring 2025",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Obruce101/todo_spring_2025.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Obruce101/todo_spring_2025/issues"
+  },
+  "homepage": "https://github.com/Obruce101/todo_spring_2025#readme"
+}
