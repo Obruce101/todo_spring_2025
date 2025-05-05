@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class SubTask {
   final String id;
   final String text;
+
   final bool isCompleted;
 
   SubTask({
@@ -41,6 +42,7 @@ class Todo {
   final DateTime? completedAt;
   final DateTime? dueAt;
   final VoidCallback? onDueDateUpdated;
+  final String? location;
 
   Todo({
     required this.id,
@@ -50,6 +52,7 @@ class Todo {
     required this.completedAt,
     required this.dueAt,
     this.onDueDateUpdated,
+    this.location,
   });
 
   Todo copyWith({VoidCallback? onDueDateUpdated}) {
@@ -62,6 +65,7 @@ class Todo {
       completedAt: completedAt,
       onDueDateUpdated: onDueDateUpdated ?? this.onDueDateUpdated,
 
+
     );
   }
 
@@ -72,11 +76,13 @@ class Todo {
       'createdAt': Timestamp.fromDate(createdAt),
       'completedAt': completedAt != null ? Timestamp.fromDate(completedAt!) : null,
       'dueAt': dueAt != null ? Timestamp.fromDate(dueAt!) : null,
+      'location': location,
     };
   }
 
   factory Todo.fromSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
+     // Log the entire document
 
     return Todo(
       id: snapshot.id,
@@ -85,6 +91,7 @@ class Todo {
       createdAt: data['createdAt'] != null ? (data['createdAt'] as Timestamp).toDate() : DateTime.now(),
       completedAt: data['completedAt'] != null ? (data['completedAt'] as Timestamp).toDate() : null,
       dueAt: data['dueAt'] != null ? (data['dueAt'] as Timestamp).toDate() : null,
+      location: data['location'],
     );
   }
 }

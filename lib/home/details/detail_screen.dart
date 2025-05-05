@@ -18,10 +18,16 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  Todo? _currentTodo;
   late TextEditingController _textController;
   late TextEditingController _subtaskController; //
+  late TextEditingController _locationController;
+  //late TextEditingController _currentLocation;
 
   DateTime? _selectedDueDate;
+  //String? _currentLocation;
+
+
 
   void _addSubtask() async {
     if (_subtaskController.text.isEmpty) return;
@@ -38,14 +44,32 @@ class _DetailScreenState extends State<DetailScreen> {
     _subtaskController.clear();
   }
 
+  Future<void> _fetchTodo() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('todos')
+        .doc(widget.todo.id)
+        .get();
 
+    setState(() {
+      _currentTodo = Todo.fromSnapshot(doc);
+      _textController = TextEditingController(text: _currentTodo!.text);
+      _locationController = TextEditingController(text: _currentTodo!.location ?? '');
+      _subtaskController = TextEditingController();
+      _selectedDueDate = _currentTodo!.dueAt;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _textController = TextEditingController(text: widget.todo.text);
+    _locationController = TextEditingController(text: widget.todo.location ?? '');
     _subtaskController = TextEditingController();
     _selectedDueDate = widget.todo.dueAt;
+    _fetchTodo();
+    //_locationController = TextEditingController(text: widget.todo.location ?? '');/_currentLocation = widget.todo.location;
+
+
   }
 
   Future<void> _delete() async {
@@ -74,6 +98,8 @@ class _DetailScreenState extends State<DetailScreen> {
           const SnackBar(content: Text('Todo updated!')),
         );
       }
+
+
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -165,13 +191,48 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
+  Future<void> _updateLocation(String newLocation) async {
+    try {
+      // Update the 'location' field in Firestore for the specific todo
+      await FirebaseFirestore.instance
+          .collection('todos')
+          .doc(widget.todo.id)
+          .update({'location': newLocation});
+
+      // Update the local TextController with the new location
+      setState(() {
+       // _currentLocation = newLocation;
+        _locationController.text = newLocation;
+        // Now updating the TextField locally
+      });
+
+      // Show success message if the widget is still mounted
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location updated!')),
+        );
+      }
+    } catch (e) {
+      // Show error message if the update failed
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update location: $e')),
+        );
+      }
+    }
+  }
+
+
   @override
   void dispose() {
     _textController.dispose();
     _subtaskController.dispose();
     super.dispose();
+    _locationController.dispose();
+    super.dispose();
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,15 +277,56 @@ class _DetailScreenState extends State<DetailScreen> {
                 border: UnderlineInputBorder(),
               ),
               onSubmitted: (newText) async {
-                if (newText.isNotEmpty && newText != widget.todo.text) {
+                if (newText.isNotEmpty && newText != _currentTodo!.text) {
                   await _updateText(newText);
                 }
               },
             ),
             const SizedBox(height: 16),
+            TextField(
+              controller: _locationController,
+              decoration: const InputDecoration(
+                labelText: 'Location',
+                border: UnderlineInputBorder(),
+              ),
+              onSubmitted: (newLocation) async {
+                if (newLocation.isNotEmpty && newLocation != _currentTodo!.location) {
+                  await _updateLocation(newLocation);
+                  setState(() {
+                    _locationController.text = newLocation;
+                  });
+                }
+              },
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: Colors.grey),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on, color: Colors.redAccent),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _locationController.text.isEmpty
+                          ? 'No location entered'
+                          : _locationController.text,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             ListTile(
               title: const Text('Due Date'),
-              subtitle: Text(_selectedDueDate?.toLocal().toString().split('.')[0] ?? 'No due date'),
+              subtitle: Text(
+                _selectedDueDate?.toLocal().toString().split('.')[0] ?? 'No due date',
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -263,8 +365,9 @@ class _DetailScreenState extends State<DetailScreen> {
 
                       final selectedTime = await showTimePicker(
                         context: context,
-                        initialTime:
-                            _selectedDueDate != null ? TimeOfDay.fromDateTime(_selectedDueDate!) : TimeOfDay.now(),
+                        initialTime: _selectedDueDate != null
+                            ? TimeOfDay.fromDateTime(_selectedDueDate!)
+                            : TimeOfDay.now(),
                       );
                       if (selectedTime == null) return;
 
@@ -282,9 +385,9 @@ class _DetailScreenState extends State<DetailScreen> {
 
                       await _updateDueDate(dueDate);
                       await _scheduleNotification(
-                        widget.todo.id,
+                        _currentTodo!.id,
                         dueDate,
-                        widget.todo.text,
+                        _currentTodo!.text,
                       );
                     },
                   ),
@@ -295,5 +398,4 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
-  }
-}
+  }}

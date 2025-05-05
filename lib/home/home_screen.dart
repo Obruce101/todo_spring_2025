@@ -9,6 +9,8 @@ import '../data/todo.dart';
 import 'details/detail_screen.dart';
 import 'filter/filter_sheet.dart';
 import 'package:intl/intl.dart';
+import 'package:audioplayers/audioplayers.dart';
+
 
 
 
@@ -22,6 +24,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _controller = TextEditingController();
   final _searchController = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  //final TextEditingController _locationController = TextEditingController();
+
+
   StreamSubscription<List<Todo>>? _todoSubscription;
   List<Todo> _todos = [];
   List<Todo>? _filteredTodos;
@@ -32,6 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int totalTasksDueToday = 0;
   int completedTasksToday = 0;
+
+  void playCompletionSound() async {
+    print('Trying to play sound');
+    await _audioPlayer.play(AssetSource('ding.ogg'));
+  }
 
   @override
   void initState() {
@@ -136,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (FirebaseAuth.instance.currentUser?.photoURL != null)
             GestureDetector(
               onTap: () {
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
@@ -193,6 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onChanged: (value) {
                         setState(() {
                           _filteredTodos = filterTodos();
+
                         });
                       },
                     ),
@@ -223,6 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   value: todo.completedAt != null,
                                   onChanged: (bool? value) {
                                     _updateTaskCompletion(todo.id, value == true);
+                                    if (value == true) {
+                                      playCompletionSound();
+                                    }
                                   },
                                 ),
                                 trailing: Row(
@@ -274,34 +290,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     color: Colors.green[100],
                     padding: const EdgeInsets.all(32.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: TextField(
-                            keyboardType: TextInputType.text,
-                            controller: _controller,
-                            decoration: const InputDecoration(
-                              labelText: 'Enter Task:',
-                            ),
+                        TextField(
+                          keyboardType: TextInputType.text,
+                          controller: _controller,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Task',
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(height: 8),
+                        //TextField(
+                          //keyboardType: TextInputType.text,
+                          //controller: _locationController,
+                          //decoration: const InputDecoration(
+                            //labelText: 'Enter Location (optional)',
+                          //),
+                        //),
+                        const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () async {
                             if (user != null && _controller.text.isNotEmpty) {
                               await FirebaseFirestore.instance.collection('todos').add({
                                 'text': _controller.text,
+                               // 'location': _locationController.text,
                                 'createdAt': FieldValue.serverTimestamp(),
                                 'uid': user.uid,
                               });
                               _controller.clear();
+                             // _locationController.clear();
                             }
                           },
-                          child: const Text('Add'),
+                          child: const Text('Add Task'),
                         ),
                       ],
                     ),
+
                   ),
                 ],
               ),

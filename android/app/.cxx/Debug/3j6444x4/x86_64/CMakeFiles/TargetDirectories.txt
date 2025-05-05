@@ -1,0 +1,2 @@
+/Users/rushabhat/StudioProjects/todo/android/app/.cxx/Debug/3j6444x4/x86_64/CMakeFiles/edit_cache.dir
+/Users/rushabhat/StudioProjects/todo/android/app/.cxx/Debug/3j6444x4/x86_64/CMakeFiles/rebuild_cache.dir
